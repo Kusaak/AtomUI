@@ -14,6 +14,12 @@ jobs:
         fetch-depth: 0
         submodules: recursive
 
+    - name: Sync submodules to remote
+      shell: pwsh
+      run: |
+        git submodule sync --recursive
+        git submodule update --init --recursive --remote
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -22,12 +28,13 @@ jobs:
     - name: Restore
       run: dotnet restore
 
-    - name: Build
-      run: dotnet build controlgallery/AtomUIGallery.Desktop -c Release
+    - name: Build (net8 only)
+      run: dotnet build controlgallery/AtomUIGallery.Desktop -c Release -f net8.0
 
     - name: Publish
       run: dotnet publish controlgallery/AtomUIGallery.Desktop `
         -c Release `
+        -f net8.0 `
         -r win-x64 `
         --self-contained false `
         -o publish
