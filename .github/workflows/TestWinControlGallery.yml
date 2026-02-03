@@ -1,0 +1,39 @@
+name: Build AtomUI ControlGallery (Windows)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: recursive
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build controlgallery/AtomUIGallery.Desktop -c Release
+
+    - name: Publish
+      run: dotnet publish controlgallery/AtomUIGallery.Desktop `
+        -c Release `
+        -r win-x64 `
+        --self-contained false `
+        -o publish
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: AtomUI-Gallery-win-x64
+        path: publish
