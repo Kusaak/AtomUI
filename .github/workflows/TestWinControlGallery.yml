@@ -22,16 +22,16 @@ jobs:
         dotnet-version: '10.0.x'
 
     # 3. 跳过 NumberUpDownShowCase（路线 A 的关键）
-    # - name: Remove problematic NumberUpDown showcase
-    #   shell: pwsh
-    #   run: |
-    #     $file = "controlgallery/AtomUIGallery/ShowCases/Views/DataEntry/NumberUpDownShowCase.axaml"
-    #     if (Test-Path $file) {
-    #       Write-Host "Removing $file to avoid Avalonia compile error"
-    #       Remove-Item $file -Force
-    #     } else {
-    #       Write-Host "File not found, skip"
-    #     }
+    - name: Remove problematic NumberUpDown showcase
+      shell: pwsh
+      run: |
+        $file = "controlgallery/AtomUIGallery/ShowCases/Views/DataEntry/NumberUpDownShowCase.axaml"
+        if (Test-Path $file) {
+          Write-Host "Removing $file to avoid Avalonia compile error"
+          Remove-Item $file -Force
+        } else {
+          Write-Host "File not found, skip"
+        }
 
     # 4. Restore
     - name: Restore dependencies
