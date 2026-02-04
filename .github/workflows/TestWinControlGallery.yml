@@ -17,21 +17,21 @@ jobs:
 
     # 2. 安装 .NET SDK（和 AtomUI 官方 Gallery 最接近）
     - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '10.0.x'
 
     # 3. 跳过 NumberUpDownShowCase（路线 A 的关键）
-    - name: Remove problematic NumberUpDown showcase
-      shell: pwsh
-      run: |
-        $file = "controlgallery/AtomUIGallery/ShowCases/Views/DataEntry/NumberUpDownShowCase.axaml"
-        if (Test-Path $file) {
-          Write-Host "Removing $file to avoid Avalonia compile error"
-          Remove-Item $file -Force
-        } else {
-          Write-Host "File not found, skip"
-        }
+    # - name: Remove problematic NumberUpDown showcase
+    #   shell: pwsh
+    #   run: |
+    #     $file = "controlgallery/AtomUIGallery/ShowCases/Views/DataEntry/NumberUpDownShowCase.axaml"
+    #     if (Test-Path $file) {
+    #       Write-Host "Removing $file to avoid Avalonia compile error"
+    #       Remove-Item $file -Force
+    #     } else {
+    #       Write-Host "File not found, skip"
+    #     }
 
     # 4. Restore
     - name: Restore dependencies
@@ -39,16 +39,12 @@ jobs:
 
     # 5. Build
     - name: Build ControlGallery
-      run: dotnet build controlgallery/AtomUIGallery.Desktop `
-            -c Release `
-            -f net8.0 `
-            --no-restore
+      run: dotnet build controlgallery/AtomUIGallery.Desktop -c Release
 
     # 6. Publish（生成可运行程序）
     - name: Publish Windows x64
       run: dotnet publish controlgallery/AtomUIGallery.Desktop `
             -c Release `
-            -f net8.0 `
             -r win-x64 `
             --self-contained false `
             -o publish
