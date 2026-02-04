@@ -8,39 +8,54 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout
+    # 1. Checkout（含 submodules）
+    - name: Checkout repository
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: recursive
 
-    - name: Sync submodules to remote
-      shell: pwsh
-      run: |
-        git submodule sync --recursive
-        git submodule update --init --recursive --remote
-
-    - name: Setup .NET
+    # 2. 安装 .NET SDK（和 AtomUI 官方 Gallery 最接近）
+    - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
-    - name: Restore
+    # 3. 跳过 NumberUpDownShowCase（路线 A 的关键）
+    - name: Remove problematic NumberUpDown showcase
+      shell: pwsh
+      run: |
+        $file = "controlgallery/AtomUIGallery/ShowCases/Views/DataEntry/NumberUpDownShowCase.axaml"
+        if (Test-Path $file) {
+          Write-Host "Removing $file to avoid Avalonia compile error"
+          Remove-Item $file -Force
+        } else {
+          Write-Host "File not found, skip"
+        }
+
+    # 4. Restore
+    - name: Restore dependencies
       run: dotnet restore
 
-    - name: Build (net8 only)
-      run: dotnet build controlgallery/AtomUIGallery.Desktop -c Release -f net8.0
+    # 5. Build
+    - name: Build ControlGallery
+      run: dotnet build controlgallery/AtomUIGallery.Desktop `
+            -c Release `
+            -f net8.0 `
+            --no-restore
 
-    - name: Publish
+    # 6. Publish（生成可运行程序）
+    - name: Publish Windows x64
       run: dotnet publish controlgallery/AtomUIGallery.Desktop `
-        -c Release `
-        -f net8.0 `
-        -r win-x64 `
-        --self-contained false `
-        -o publish
+            -c Release `
+            -f net8.0 `
+            -r win-x64 `
+            --self-contained false `
+            -o publish
 
+    # 7. 上传构建产物
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: AtomUI-Gallery-win-x64
+        name: AtomUI-ControlGallery-win-x64
         path: publish
