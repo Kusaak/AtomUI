@@ -56,6 +56,7 @@ jobs:
     - name: Publish Windows x64
       run: dotnet publish controlgallery/AtomUIGallery.Desktop `
             -c Release `
+            -f net8.0 `
             -r win-x64 `
             --self-contained false `
             -o publish
