@@ -23,19 +23,29 @@ jobs:
     - name: Remove problematic NumberUpDown showcase
       shell: pwsh
       run: |
+        # 1. 删除 View 文件
         $files = @(
           "controlgallery/AtomUIGallery/ShowCases/Views/DataEntry/NumberUpDownShowCase.axaml",
           "controlgallery/AtomUIGallery/ShowCases/Views/DataEntry/NumberUpDownShowCase.axaml.cs"
         )
-
+    
         foreach ($file in $files) {
           if (Test-Path $file) {
             Write-Host "Removing $file"
             Remove-Item $file -Force
-          } else {
-            Write-Host "File not found: $file"
           }
         }
+    
+        # 2. 从 ShowCaseRegister.cs 中移除注册
+        $registerFile = "controlgallery/AtomUIGallery/ShowCases/ShowCaseRegister.cs"
+    
+        if (Test-Path $registerFile) {
+          Write-Host "Patching ShowCaseRegister.cs"
+          (Get-Content $registerFile) |
+            Where-Object { $_ -notmatch "NumberUpDownShowCase" } |
+            Set-Content $registerFile
+        }
+    
 
     - name: Restore dependencies
       run: dotnet restore
